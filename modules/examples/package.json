@@ -1,0 +1,12 @@
+{
+  "name": "examples",
+  "version": "0.0.1",
+  "dependencies": {
+    "@eff/dom": "*",
+    "@types/webpack": "^4.4.16",
+    "file-loader": "^2.0.0",
+    "ts-loader": "^5.2.1",
+    "webpack-cli": "^3.1.2",
+    "webpack": "^4.20.2"
+  }
+}

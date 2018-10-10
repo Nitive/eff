@@ -1,0 +1,8 @@
+{
+  "name": "@eff/tests",
+  "version": "0.0.1",
+  "dependencies": {
+    "@eff/dom": "*",
+    "snabbdom-to-html": "^5.1.1"
+  }
+}

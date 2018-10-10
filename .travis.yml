@@ -1,0 +1,10 @@
+language: node_js
+
+cache:
+  yarn: true
+
+node_js:
+  - v8
+
+script:
+  - make test
