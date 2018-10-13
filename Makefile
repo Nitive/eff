@@ -8,3 +8,6 @@ unit:
 	npx jest
 
 test: tsc lint unit
+
+examples-watch:
+	npx webpack --config modules/examples/webpack.config.ts --watch

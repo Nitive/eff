@@ -1,5 +1,5 @@
-import xs, { Stream } from 'xstream'
 import * as Snabbdom from '@eff/dom/h'
+import xs, { Stream } from 'xstream'
 import toHTML = require('snabbdom-to-html')
 
 export function toPromise<T>(stream: Stream<T>): Promise<T> {
@@ -229,7 +229,7 @@ describe('jsx', () => {
     }
 
     expect(await run(<Button />)).toBe('<button></button>')
-    expect(checkSources).toHaveBeenCalledWith({ DOM: undefined, fn1: undefined })
+    expect(checkSources).toHaveBeenCalledWith({ DOM: undefined, fn: undefined })
   })
 
   it('should support returning array in component', async () => {

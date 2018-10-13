@@ -23,12 +23,15 @@ function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
   const refs: { [refId: string]: Ref<Node> } = {}
 
   function addHooksForRefs(vnode: VNode): VNode {
+    const children = vnode.children && vnode.children.map(addHooksForRefs)
     if (vnode.data) {
-      const { ref: refId, ...data } = vnode.data
+      const { props, ...data } = vnode.data
+      const refId = props && props.ref && props.ref.id
 
       if (refId) {
         return {
           ...vnode,
+          children,
           data: {
             ...data,
             hook: {
@@ -56,7 +59,8 @@ function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
         }
       }
     }
-    return vnode
+
+    return { ...vnode, children }
   }
 
   const vnodeWithRefs$ = vnode$.map(addHooksForRefs)
