@@ -3,7 +3,7 @@ import { DOMSource } from '@eff/dom/shared'
 import { run } from '@eff/core/run'
 import { makeDomDriver } from '@eff/dom/client'
 
-describe('dom', () => {
+describe.skip('dom', () => {
   it('should support events on refs', async () => {
     function App(_props: any, sources: { DOM: DOMSource }) {
       const buttonRef = sources.DOM.createRef()

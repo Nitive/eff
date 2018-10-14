@@ -1,5 +1,5 @@
 tsc:
-	npx tsc -p . --noEmit --pretty
+	npx tsc -p . --noEmit
 
 lint:
 	npx tslint --project . --format stylish

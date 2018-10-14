@@ -1,8 +1,15 @@
 import { VNode } from 'snabbdom/vnode'
 import xs, { Stream } from 'xstream'
-import { isEffect } from '@eff/core/run'
 
 function selectDOMStream(effects: any, sources: any): Stream<VNode | string | Array<VNode | string> | undefined> {
+  if (typeof effects === 'function') {
+    return selectDOMStream(effects(sources), sources)
+  }
+
+  if (effects === true) {
+    return xs.of('true')
+  }
+
   if (effects instanceof Stream) {
     return (effects as Stream<VNode>)
       .map(effects => selectDOMStream(effects, sources))
@@ -26,33 +33,29 @@ function selectDOMStream(effects: any, sources: any): Stream<VNode | string | Ar
     return xs.of(effects)
   }
 
-  if (typeof effects === 'undefined') {
-    return xs.of(undefined)
+  if (typeof effects === 'number') {
+    return xs.of(String(effects))
   }
 
-  if (isEffect(effects)) {
-    return xs.of(undefined)
+  if (effects && (effects.sel || effects.text !== undefined)) {
+    const vnode = effects
+
+    if (vnode.children) {
+      const children$ = selectDOMStream(vnode.children, sources) as Stream<Array<VNode | string>>
+
+      return children$
+        .map((children): VNode => {
+          return {
+            ...vnode,
+            children,
+          }
+        })
+    }
+
+    return xs.of(vnode)
   }
 
-  if (effects.DOM) {
-    return selectDOMStream(effects.DOM, sources)
-  }
-
-  const vnode = effects
-
-  if (vnode.children) {
-    const children$ = selectDOMStream(vnode.children, sources) as Stream<Array<VNode | string>>
-
-    return children$
-      .map((children): VNode => {
-        return {
-          ...vnode,
-          children,
-        }
-      })
-  }
-
-  return xs.of(vnode)
+  return xs.of(undefined)
 }
 
 export function selectDOMEff(effects: any, sources: any): Stream<VNode> {

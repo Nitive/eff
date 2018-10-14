@@ -22,8 +22,16 @@ function createRef(id: string, elm$: Stream<Node | undefined>): Ref<Node> {
 function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
   const refs: { [refId: string]: Ref<Node> } = {}
 
-  function addHooksForRefs(vnode: VNode): VNode {
-    const children = vnode.children && vnode.children.map(addHooksForRefs)
+  function prepareVNodes(vnode: VNode | string): VNode {
+    if (typeof vnode === 'string') {
+      return { text: vnode } as VNode
+    }
+
+    const children = ([] as Array<VNode | string>)
+      .concat(vnode.children || [])
+      .concat(vnode.text || [])
+      .map(prepareVNodes)
+
     if (vnode.data) {
       const { props, ...data } = vnode.data
       const refId = props && props.ref && props.ref.id
@@ -34,6 +42,7 @@ function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
           children,
           data: {
             ...data,
+            // TODO: кажется ещё нужно передавать пропсы
             hook: {
               ...data.hook,
               insert: vn => {
@@ -63,7 +72,7 @@ function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
     return { ...vnode, children }
   }
 
-  const vnodeWithRefs$ = vnode$.map(addHooksForRefs)
+  const vnodeWithRefs$ = vnode$.map(prepareVNodes)
 
   const withNode = (vnodeWithRefs$ as Stream<VNode | HTMLElement>).startWith(node)
 
