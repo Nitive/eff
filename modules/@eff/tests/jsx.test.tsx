@@ -235,7 +235,7 @@ describe('jsx', () => {
   //   expect(fn).toHaveBeenCalledTimes(1)
   // })
 
-  it('should render simple component with stream of component child', async () => {
+  it('should be possible to get sources inside component', async () => {
     const checkSources = jest.fn()
     function Button(_props: any, sources: any) {
       checkSources(sources)
@@ -246,6 +246,18 @@ describe('jsx', () => {
     expect(await dom(<Button />)).toBe('<button></button>')
     expect(checkSources).toHaveBeenCalledTimes(1)
   })
+
+  // it('should be possible to get sources inside component which is inside div', async () => {
+  //   const checkSources = jest.fn()
+  //   function Button(_props: any, sources: any) {
+  //     checkSources(sources)
+  //     expect(sources.DOM).not.toBeFalsy()
+  //     return <button />
+  //   }
+
+  //   expect(await dom(<div><Button /></div>)).toBe('<button></button>')
+  //   expect(checkSources).toHaveBeenCalledTimes(1)
+  // })
 
   it('should support returning array in component', async () => {
     function Buttons() {
