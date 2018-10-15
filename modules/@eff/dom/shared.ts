@@ -1,5 +1,7 @@
+import { isEffect } from '@eff/core/effect'
 import { VNode } from 'snabbdom/vnode'
 import xs, { Stream } from 'xstream'
+import { isVNode } from './vnode'
 
 type Visitor = (node: any, visit: (effects: any, sources: any) => Stream<any>, sources: any) => Stream<any>
 
@@ -18,7 +20,11 @@ interface Visitors {
   unknown: Visitor,
 }
 
-export const standardVisitors: Pick<Visitors, 'component' | 'stream' | 'array' | 'vnode' | 'unknown'> = {
+function unknownNodeVisitor() {
+  return xs.of(undefined)
+}
+
+export const standardVisitors: Partial<Visitors> = {
   component(node, visit, sources) {
     return visit(node(sources), sources)
   },
@@ -31,8 +37,8 @@ export const standardVisitors: Pick<Visitors, 'component' | 'stream' | 'array' |
     return xs
       .combine(...(node as Array<any>)
       .map(x => visit(x, sources)))
-      .map((children: Array<any>) => {
-        return children
+      .map((nodes: Array<any>) => {
+        return nodes
           .reduce((acc, child) => {
             return child !== undefined
               ? acc.concat(child)
@@ -42,9 +48,6 @@ export const standardVisitors: Pick<Visitors, 'component' | 'stream' | 'array' |
   },
   vnode(node, visit, sources) {
     return visit(node.children, sources)
-  },
-  unknown() {
-    return xs.of(undefined)
   },
 }
 
@@ -57,17 +60,17 @@ export function select(visitors: Partial<Visitors>, effects: any, sources: any):
     typeof effects === 'function' && 'component'
     || effects instanceof Stream && 'stream'
     || Array.isArray(effects) && 'array'
-    || effects && (effects.sel || effects.text !== undefined) && 'vnode'
+    || isVNode(effects) && 'vnode'
     || typeof effects === 'string' && 'string'
     || typeof effects === 'number' && 'number'
     || typeof effects === 'boolean' && 'boolean'
     || effects === undefined && 'undefined'
     || effects === null && 'null'
     || typeof effects === 'symbol' && 'symbol'
-    || effects && effects.effectType && 'effect'
+    || isEffect(effects) && 'effect'
     || 'unknown'
 
-  const visitor = visitors[visitorName] || standardVisitors[visitorName] || standardVisitors.unknown
+  const visitor = visitors[visitorName] || standardVisitors[visitorName] || unknownNodeVisitor
 
   return visitor(effects, visit, sources)
 }
@@ -89,10 +92,7 @@ export function selectDOMEff(effects: any, sources: any): Stream<VNode> {
 
         return children$
           .map((children): VNode => {
-            return {
-              ...node,
-              children,
-            }
+            return { ...node, children }
           })
       }
 

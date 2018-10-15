@@ -1,10 +1,10 @@
-import { init } from 'snabbdom'
 import { Driver } from '@eff/core/run'
-import xs, { Stream } from 'xstream'
+import { init } from 'snabbdom'
 import { VNode } from 'snabbdom/vnode'
-import pairwise from 'xstream/extra/pairwise'
-import { selectDOMEff, DOMSource, Ref } from './shared'
+import xs, { Stream } from 'xstream'
 import fromEvent from 'xstream/extra/fromEvent'
+import pairwise from 'xstream/extra/pairwise'
+import { DOMSource, Ref, selectDOMEff } from './shared'
 
 function createRef(id: string, elm$: Stream<Node | undefined>): Ref<Node> {
   return {
@@ -24,13 +24,10 @@ function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
 
   function prepareVNodes(vnode: VNode | string): VNode {
     if (typeof vnode === 'string') {
-      return { text: vnode } as VNode
+      return { text: vnode } as any
     }
 
-    const children = ([] as Array<VNode | string>)
-      .concat(vnode.children || [])
-      .concat(vnode.text || [])
-      .map(prepareVNodes)
+    const children = (vnode.children || []).map(prepareVNodes)
 
     if (vnode.data) {
       const { props, ...data } = vnode.data

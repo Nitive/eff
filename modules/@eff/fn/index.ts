@@ -1,6 +1,7 @@
-import { Driver, Effect } from '@eff/core/run'
-import xs, { Stream } from 'xstream'
+import { createEffect, Effect } from '@eff/core/effect'
+import { Driver } from '@eff/core/run'
 import { select } from '@eff/dom/shared'
+import xs, { Stream } from 'xstream'
 
 type FnSink = { code: string, fn: () => void }
 
@@ -38,5 +39,5 @@ export function makeFnDriver(): Driver<Stream<FnSink>, void> {
 }
 
 export function invoke(code: string, fn: () => void) {
-  return { effectType: fnEffectType, sink$: xs.of({ code, fn }) }
+  return createEffect(fnEffectType, xs.of({ code, fn }))
 }

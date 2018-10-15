@@ -1,12 +1,7 @@
+import { Element } from '@eff/dom/types'
 import xs, { Stream } from 'xstream'
 import { keys } from '../utils/keys'
 import { mapObject } from '../utils/map-object'
-import { Element } from '@eff/dom/types'
-
-export interface Effect {
-  effectType: Symbol,
-  sink$: Stream<any>
-}
 
 export interface Driver<Sink, Source> {
   run(sink: Sink): Source,
@@ -31,8 +26,4 @@ export function run<Sources, Sinks extends { [K in keyof Sources]: Stream<any> }
   keys(sinks).forEach(key => {
     fakeSinks[key].imitate(sinks[key])
   })
-}
-
-export function isEffect(eff: any): eff is Effect {
-  return !!(eff as Effect).effectType
 }
