@@ -4,7 +4,7 @@ import { mapObject } from '../utils/map-object'
 import { Element } from '@eff/dom/types'
 
 export interface Effect {
-  effectType: string,
+  effectType: Symbol,
   sink$: Stream<any>
 }
 

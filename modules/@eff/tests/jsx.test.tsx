@@ -3,7 +3,6 @@ import { makeDomDriver, DOMSource } from '@eff/dom/client'
 import * as Snabbdom from '@eff/dom/h'
 import xs, { Stream } from 'xstream'
 import { makeFnDriver, invoke } from '../fn'
-// import toHTML = require('snabbdom-to-html')
 
 export function toPromise<T>(stream: Stream<T>): Promise<T> {
   return new Promise((resolve, reject) => {
@@ -17,28 +16,6 @@ export function toPromise<T>(stream: Stream<T>): Promise<T> {
       })
   })
 }
-
-// function composeEffFunctions(f: () => void, g: () => void) {
-//   return () => {
-//     f()
-//     g()
-//   }
-// }
-
-// function runFnEff(fn$: Stream<(() => void) | void>): Promise<void> {
-//   const finalFn$ = fn$.filter(Boolean).fold(composeEffFunctions, () => {})
-
-//   return toPromise(finalFn$).then(f => f())
-// }
-
-// function runWithEffs(app: any): { DOM: Promise<string>, fn: Promise<void> } {
-//   const sinks = app({ DOM: undefined, fn: undefined })
-
-//   return {
-//     DOM: toPromise<string>(sinks.DOM.map(toHTML)),
-//     fn: runFnEff(sinks.fn || xs.empty()),
-//   }
-// }
 
 interface Sources {
   DOM: DOMSource
@@ -140,24 +117,24 @@ describe('jsx', () => {
 
   it('should render div with effect child', async () => {
     const fn = jest.fn()
-    const r = await effs(<div>{invoke('TEST_FN', fn)}</div>)
-    expect(await r.DOM).toBe('<div></div>')
+    const result = await effs(<div>{invoke('TEST_FN', fn)}</div>)
+    expect(result.DOM).toBe('<div></div>')
     expect(fn).toHaveBeenCalledTimes(1)
   })
 
-  // it.skip('should render div with effect children', async () => {
-  //   const fn = jest.fn()
-  //   const fn2 = jest.fn()
-  //   const effs = runWithEffs(
-  //     <div>
-  //       {invoke(fn)}
-  //       {invoke(fn2)}
-  //     </div>,
-  //   )
-  //   expect(await effs.DOM).toBe('<div></div>')
-  //   expect(fn).toHaveBeenCalledTimes(1)
-  //   expect(fn2).toHaveBeenCalledTimes(1)
-  // })
+  it('should render div with effect children', async () => {
+    const fn = jest.fn()
+    const fn2 = jest.fn()
+    const result = await effs(
+      <div>
+        {invoke('TEST', fn)}
+        {invoke('TEST', fn2)}
+      </div>,
+    )
+    expect(result.DOM).toBe('<div></div>')
+    expect(fn).toHaveBeenCalledTimes(1)
+    expect(fn2).toHaveBeenCalledTimes(1)
+  })
 
   it('should render div with number child', async () => {
     expect(await dom(<div>{0}</div>)).toBe('<div>0</div>')
@@ -232,13 +209,12 @@ describe('jsx', () => {
     expect(await dom(<div>{xs.of(<span />)}</div>)).toBe('<div><span></span></div>')
   })
 
-  // it.skip('should render div with stream of effect child', async () => {
-  //   const fn = jest.fn()
-  //   const effs = runWithEffs(<div>{xs.of(invoke(fn))}</div>)
-  //   expect(await effs.DOM).toBe('<div></div>')
-  //   await effs.fn
-  //   expect(fn).toHaveBeenCalledTimes(1)
-  // })
+  it('should render div with stream of effect child', async () => {
+    const fn = jest.fn()
+    const result = await effs(<div>{xs.of(invoke('TEST', fn))}</div>)
+    expect(result.DOM).toBe('<div></div>')
+    expect(fn).toHaveBeenCalledTimes(1)
+  })
 
   it('should be possible to get sources inside component', async () => {
     const checkSources = jest.fn()

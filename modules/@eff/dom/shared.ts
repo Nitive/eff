@@ -1,65 +1,106 @@
 import { VNode } from 'snabbdom/vnode'
 import xs, { Stream } from 'xstream'
 
-function selectDOMStream(effects: any, sources: any): Stream<VNode | string | Array<VNode | string> | undefined> {
-  if (typeof effects === 'function') {
-    return selectDOMStream(effects(sources), sources)
-  }
+type Visitor = (node: any, visit: (effects: any, sources: any) => Stream<any>, sources: any) => Stream<any>
 
-  if (effects === true) {
-    return xs.of('true')
-  }
+interface Visitors {
+  component: Visitor,
+  stream: Visitor,
+  array: Visitor,
+  vnode: Visitor,
+  string: Visitor,
+  number: Visitor,
+  boolean: Visitor,
+  undefined: Visitor,
+  null: Visitor,
+  symbol: Visitor,
+  effect: Visitor,
+  unknown: Visitor,
+}
 
-  if (effects instanceof Stream) {
-    return (effects as Stream<VNode>)
-      .map(effects => selectDOMStream(effects, sources))
+export const standardVisitors: Pick<Visitors, 'component' | 'stream' | 'array' | 'vnode' | 'unknown'> = {
+  component(node, visit, sources) {
+    return visit(node(sources), sources)
+  },
+  stream(node, visit, sources) {
+    return (node as Stream<any>)
+      .map(effects => visit(effects, sources))
       .flatten()
-  }
-
-  if (Array.isArray(effects)) {
+  },
+  array(node, visit, sources) {
     return xs
-      .combine(...(effects as Array<VNode>).map(x => selectDOMStream(x, sources)))
-      .map((children: Array<VNode | VNode[] | string | string[] | undefined>) => {
+      .combine(...(node as Array<any>)
+      .map(x => visit(x, sources)))
+      .map((children: Array<any>) => {
         return children
           .reduce((acc, child) => {
             return child !== undefined
               ? acc.concat(child)
               : acc
-          }, [] as Array<VNode | string>)
+          }, [] as Array<any>)
       })
+  },
+  vnode(node, visit, sources) {
+    return visit(node.children, sources)
+  },
+  unknown() {
+    return xs.of(undefined)
+  },
+}
+
+export function select(visitors: Partial<Visitors>, effects: any, sources: any): Stream<any> {
+  const visit = (effects: any, sources: any) => {
+    return select(visitors, effects, sources)
   }
 
-  if (typeof effects === 'string') {
-    return xs.of(effects)
-  }
+  const visitorName: keyof Visitors =
+    typeof effects === 'function' && 'component'
+    || effects instanceof Stream && 'stream'
+    || Array.isArray(effects) && 'array'
+    || effects && (effects.sel || effects.text !== undefined) && 'vnode'
+    || typeof effects === 'string' && 'string'
+    || typeof effects === 'number' && 'number'
+    || typeof effects === 'boolean' && 'boolean'
+    || effects === undefined && 'undefined'
+    || effects === null && 'null'
+    || typeof effects === 'symbol' && 'symbol'
+    || effects && effects.effectType && 'effect'
+    || 'unknown'
 
-  if (typeof effects === 'number') {
-    return xs.of(String(effects))
-  }
+  const visitor = visitors[visitorName] || standardVisitors[visitorName] || standardVisitors.unknown
 
-  if (effects && (effects.sel || effects.text !== undefined)) {
-    const vnode = effects
-
-    if (vnode.children) {
-      const children$ = selectDOMStream(vnode.children, sources) as Stream<Array<VNode | string>>
-
-      return children$
-        .map((children): VNode => {
-          return {
-            ...vnode,
-            children,
-          }
-        })
-    }
-
-    return xs.of(vnode)
-  }
-
-  return xs.of(undefined)
+  return visitor(effects, visit, sources)
 }
 
 export function selectDOMEff(effects: any, sources: any): Stream<VNode> {
-  const vnode$ = selectDOMStream(effects, sources)
+  const visitors: Partial<Visitors> = {
+    string(node) {
+      return xs.of(node)
+    },
+    number(node) {
+      return xs.of(String(node))
+    },
+    boolean(node) {
+      return xs.of(String(node || ''))
+    },
+    vnode(node, visit, sources) {
+      if (node.children) {
+        const children$ = visit(node.children, sources) as Stream<Array<any>>
+
+        return children$
+          .map((children): VNode => {
+            return {
+              ...node,
+              children,
+            }
+          })
+      }
+
+      return xs.of(node)
+    },
+  }
+
+  const vnode$ = select(visitors, effects, sources)
 
   return vnode$
     .map(vnode => {
