@@ -1,13 +1,9 @@
 import { Driver } from '@eff/core/run'
 import xs, { Stream } from 'xstream'
 
-export interface FnSource {
-  invoke(code: string, fn: () => void): void,
-}
-
 type FnSink = { code: string, fn: () => void }
 
-export function makeFnDriver(): Driver<Stream<FnSink>, FnSource> {
+export function makeFnDriver(): Driver<Stream<FnSink>, void> {
   return {
     run(sink: Stream<FnSink>) {
       sink.addListener({
@@ -15,15 +11,14 @@ export function makeFnDriver(): Driver<Stream<FnSink>, FnSource> {
           fn()
         },
       })
-
-      return {
-        invoke(code, fn) {
-          return { effectType: 'fn', sink$: xs.of({ code, fn }) }
-        },
-      }
     },
     select(effects) {
-      return effects.fn.filter(Boolean)
+      // TODO: select in all tree
+      return effects.children[0].sink$.filter(Boolean)
     },
   }
+}
+
+export function invoke(code: string, fn: () => void) {
+  return { effectType: 'fn', sink$: xs.of({ code, fn }) }
 }

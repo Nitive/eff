@@ -2,6 +2,7 @@ import { run } from '@eff/core/run'
 import { makeDomDriver, DOMSource } from '@eff/dom/client'
 import * as Snabbdom from '@eff/dom/h'
 import xs, { Stream } from 'xstream'
+import { makeFnDriver, invoke } from '../fn'
 // import toHTML = require('snabbdom-to-html')
 
 export function toPromise<T>(stream: Stream<T>): Promise<T> {
@@ -44,7 +45,7 @@ interface Sources {
 }
 
 async function dom(app: any): Promise<string> {
-  document.body.innerHTML = '<div id="app"></div>'
+  document.body.innerHTML = '<div id="app">Loading...</div>'
   run(app, {
     DOM: makeDomDriver('#app'),
   })
@@ -52,9 +53,17 @@ async function dom(app: any): Promise<string> {
   return document.body.innerHTML
 }
 
-// function invoke(fn: () => void) {
-//   return { effectType: 'fn', sink$: xs.of(fn) }
-// }
+async function effs(app: any): Promise<{ DOM: string }> {
+  document.body.innerHTML = '<div id="app"></div>'
+  run(app, {
+    DOM: makeDomDriver('#app'),
+    fn: makeFnDriver(),
+  })
+
+  return {
+    DOM: document.body.innerHTML,
+  }
+}
 
 describe('jsx', () => {
   it('should render plain div', async () => {
@@ -129,13 +138,12 @@ describe('jsx', () => {
     expect(await dom(<div>{true}</div>)).toBe('<div>true</div>')
   })
 
-  // it.skip('should render div with effect child', async () => {
-  //   const fn = jest.fn()
-  //   const effs = runWithEffs(<div>{invoke(fn)}</div>)
-  //   expect(await effs.DOM).toBe('<div></div>')
-  //   await effs.fn
-  //   expect(fn).toHaveBeenCalledTimes(1)
-  // })
+  it('should render div with effect child', async () => {
+    const fn = jest.fn()
+    const r = await effs(<div>{invoke('TEST_FN', fn)}</div>)
+    expect(await r.DOM).toBe('<div></div>')
+    expect(fn).toHaveBeenCalledTimes(1)
+  })
 
   // it.skip('should render div with effect children', async () => {
   //   const fn = jest.fn()
