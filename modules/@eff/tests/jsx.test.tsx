@@ -39,12 +39,6 @@ export function toPromise<T>(stream: Stream<T>): Promise<T> {
 //   }
 // }
 
-function wait(ms: number) {
-  return new Promise(resolve => {
-    setTimeout(resolve, ms)
-  })
-}
-
 interface Sources {
   DOM: DOMSource
 }
@@ -55,7 +49,6 @@ async function dom(app: any): Promise<string> {
     DOM: makeDomDriver('#app'),
   })
 
-  await wait(0)
   return document.body.innerHTML
 }
 
