@@ -1,5 +1,5 @@
 import { run } from '@eff/core/run'
-import { makeDomDriver } from '@eff/dom/client'
+import { makeDomDriver, DOMSource } from '@eff/dom/client'
 import * as Snabbdom from '@eff/dom/h'
 import xs, { Stream } from 'xstream'
 // import toHTML = require('snabbdom-to-html')
@@ -43,6 +43,10 @@ function wait(ms: number) {
   return new Promise(resolve => {
     setTimeout(resolve, ms)
   })
+}
+
+interface Sources {
+  DOM: DOMSource
 }
 
 async function dom(app: any): Promise<string> {
@@ -237,7 +241,7 @@ describe('jsx', () => {
 
   it('should be possible to get sources inside component', async () => {
     const checkSources = jest.fn()
-    function Button(_props: any, sources: any) {
+    function Button(_props: {}, sources: Sources) {
       checkSources(sources)
       expect(sources.DOM).not.toBeFalsy()
       return <button />
@@ -247,17 +251,19 @@ describe('jsx', () => {
     expect(checkSources).toHaveBeenCalledTimes(1)
   })
 
-  // it('should be possible to get sources inside component which is inside div', async () => {
-  //   const checkSources = jest.fn()
-  //   function Button(_props: any, sources: any) {
-  //     checkSources(sources)
-  //     expect(sources.DOM).not.toBeFalsy()
-  //     return <button />
-  //   }
+  it('should be possible to get sources inside component which is inside div', async () => {
+    const checkSources = jest.fn()
+    function Button(_props: {}, sources: Sources) {
+      checkSources(sources)
+      expect(sources.DOM).not.toBeFalsy()
+      return <button />
+    }
 
-  //   expect(await dom(<div><Button /></div>)).toBe('<button></button>')
-  //   expect(checkSources).toHaveBeenCalledTimes(1)
-  // })
+    const x = <div><Button /></div>
+
+    expect(await dom(x)).toBe('<div><button></button></div>')
+    expect(checkSources).toHaveBeenCalledTimes(1)
+  })
 
   it('should support returning array in component', async () => {
     function Buttons() {

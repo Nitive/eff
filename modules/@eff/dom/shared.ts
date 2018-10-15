@@ -18,7 +18,7 @@ function selectDOMStream(effects: any, sources: any): Stream<VNode | string | Ar
 
   if (Array.isArray(effects)) {
     return xs
-      .combine(...(effects as Array<VNode>).map(selectDOMStream))
+      .combine(...(effects as Array<VNode>).map(x => selectDOMStream(x, sources)))
       .map((children: Array<VNode | VNode[] | string | string[] | undefined>) => {
         return children
           .reduce((acc, child) => {
