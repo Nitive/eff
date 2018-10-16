@@ -2,7 +2,9 @@ import { VNode } from 'snabbdom/vnode'
 import xs, { Stream } from 'xstream'
 import { select, Visitors } from './select'
 
+export { Ref } from './ref'
 export { select } from './select'
+export { DOMSource } from './source'
 
 export function selectDOMEff(effects: any, sources: any): Stream<VNode> {
   const visitors: Partial<Visitors> = {
@@ -47,14 +49,4 @@ export function selectDOMEff(effects: any, sources: any): Stream<VNode> {
 
       return vnode
     })
-}
-
-export interface Ref<T> {
-  id: string,
-  elm$: Stream<T | undefined>,
-  events(event: string): Stream<Event>,
-}
-
-export interface DOMSource {
-  createRef<T extends Node>(): Ref<T>
 }
