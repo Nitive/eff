@@ -24,8 +24,8 @@ function App(_props: {}, sources: Sources) {
     .fold(acc => acc + 1, 0)
 
   return (
-    <div style={'margin: 20px' as any}>
-      <div style={'margin-bottom: 10px; padding: 5px; border: 1px solid black; width: 100px' as any}>
+    <div style={{ margin: '20px' }}>
+      <div style={{ marginBottom: '10px', padding: '5px', border: '1px solid black', width: '100px' }}>
         <div>Clicks: {buttonClick$}</div>
         <button ref={buttonRef}>inc</button>
       </div>

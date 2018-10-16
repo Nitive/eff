@@ -18,6 +18,62 @@ function createRef(id: string, elm$: Stream<Node | undefined>): Ref<Node> {
   }
 }
 
+function attachRefs(vnode: VNode, refs: { [refId: string]: Ref<Node> }): VNode {
+  const { data } = vnode
+  const ref = vnode.data && vnode.data.props && vnode.data.props.ref
+
+  if (!ref || !ref.id || !data) {
+    return vnode
+  }
+
+  return {
+    ...vnode,
+    data: {
+      ...data,
+      hook: {
+        ...data.hook,
+        insert: vn => {
+          refs[ref.id].elm$.shamefullySendNext(vn.elm || undefined)
+          if (data.hook && data.hook.insert) {
+            data.hook.insert(vn)
+          }
+        },
+        update: (old, vn) => {
+          refs[ref.id].elm$.shamefullySendNext(vn.elm || undefined)
+          if (data.hook && data.hook.update) {
+            data.hook.update(old, vn)
+          }
+        },
+        destroy: vn => {
+          refs[ref.id].elm$.shamefullySendNext(undefined)
+          if (data.hook && data.hook.destroy) {
+            data.hook.destroy(vn)
+          }
+        },
+      },
+    },
+  }
+}
+
+function addStyle(vnode: VNode): VNode {
+  const props = vnode.data && vnode.data.props
+
+  if (!props) {
+    return vnode
+  }
+
+  const { style, ...rest } = props
+
+  return {
+    ...vnode,
+    data: {
+      ...vnode.data,
+      props: rest,
+      style,
+    },
+  }
+}
+
 export function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
   const refs: { [refId: string]: Ref<Node> } = {}
 
@@ -28,44 +84,10 @@ export function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
 
     const children = (vnode.children || []).map(prepareVNodes)
 
-    if (vnode.data) {
-      const { props, ...data } = vnode.data
-      const refId = props && props.ref && props.ref.id
-
-      if (refId) {
-        return {
-          ...vnode,
-          children,
-          data: {
-            ...data,
-            // TODO: кажется ещё нужно передавать пропсы
-            hook: {
-              ...data.hook,
-              insert: vn => {
-                refs[refId].elm$.shamefullySendNext(vn.elm || undefined)
-                if (data.hook && data.hook.insert) {
-                  data.hook.insert(vn)
-                }
-              },
-              update: (old, vn) => {
-                refs[refId].elm$.shamefullySendNext(vn.elm || undefined)
-                if (data.hook && data.hook.update) {
-                  data.hook.update(old, vn)
-                }
-              },
-              destroy: vn => {
-                refs[refId].elm$.shamefullySendNext(undefined)
-                if (data.hook && data.hook.destroy) {
-                  data.hook.destroy(vn)
-                }
-              },
-            },
-          },
-        }
-      }
+    return {
+      ...addStyle(attachRefs(vnode, refs)),
+      children,
     }
-
-    return { ...vnode, children }
   }
 
   const vnodeWithRefs$ = vnode$.map(prepareVNodes)
