@@ -1,6 +1,6 @@
-import { run } from '@eff/core/run'
-import { makeDomDriver, DOMSource } from '@eff/dom/client'
-import * as Snabbdom from '@eff/dom/h'
+import { run } from '@eff/core'
+import EffDOM, { DOMSource } from '@eff/dom'
+import { makeDomDriver } from '@eff/dom/client'
 import xs from 'xstream'
 
 interface Sources {

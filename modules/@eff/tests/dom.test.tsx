@@ -1,6 +1,5 @@
-import * as Snabbdom from '@eff/dom/h'
-import { DOMSource } from '@eff/dom/shared'
-import { run } from '@eff/core/run'
+import { run } from '@eff/core'
+import EffDOM, { DOMSource } from '@eff/dom'
 import { makeDomDriver } from '@eff/dom/client'
 
 describe('dom', () => {

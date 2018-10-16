@@ -1,8 +1,8 @@
-import { run } from '@eff/core/run'
-import { makeDomDriver, DOMSource } from '@eff/dom/client'
-import * as Snabbdom from '@eff/dom/h'
+import { run } from '@eff/core'
+import EffDOM, { DOMSource } from '@eff/dom'
+import { makeDomDriver } from '@eff/dom/client'
+import { invoke, makeFnDriver } from '@eff/fn'
 import xs, { Stream } from 'xstream'
-import { makeFnDriver, invoke } from '../fn'
 
 export function toPromise<T>(stream: Stream<T>): Promise<T> {
   return new Promise((resolve, reject) => {

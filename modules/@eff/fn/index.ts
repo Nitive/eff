@@ -1,6 +1,5 @@
-import { createEffect, Effect } from '@eff/core/effect'
-import { Driver } from '@eff/core/run'
-import { select } from '@eff/dom/shared'
+import { createEffect, Driver, Effect } from '@eff/core'
+import { select } from '@eff/dom'
 import xs, { Stream } from 'xstream'
 
 type FnSink = { code: string, fn: () => void }
@@ -27,8 +26,8 @@ export function makeFnDriver(): Driver<Stream<FnSink>, void> {
         },
       }
       return select(visitors, effects, sources)
-        .map(x => {
-          return Array.isArray(x) ? xs.from(x) : xs.of(x)
+        .map(eff => {
+          return Array.isArray(eff) ? xs.from(eff) : xs.of(eff)
         })
         .flatten()
         .map(eff => eff.sink$)

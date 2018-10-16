@@ -2,7 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "jsx": "react",
-    "jsxFactory": "Snabbdom.createElement",
+    "jsxFactory": "EffDOM.createElement",
     "lib": [
       "dom",
       "es2015",

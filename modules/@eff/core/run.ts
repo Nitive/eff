@@ -1,7 +1,7 @@
 import { Element } from '@eff/dom/types'
 import xs, { Stream } from 'xstream'
-import { keys } from '../utils/keys'
-import { mapObject } from '../utils/map-object'
+import { keys } from './utils/keys'
+import { mapObject } from './utils/map-object'
 
 export interface Driver<Sink, Source> {
   run(sink: Sink): Source,

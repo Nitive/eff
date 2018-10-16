@@ -1,4 +1,4 @@
-import { Driver } from '@eff/core/run'
+import { Driver } from '@eff/core'
 import { init } from 'snabbdom'
 import { VNode } from 'snabbdom/vnode'
 import xs, { Stream } from 'xstream'
@@ -119,5 +119,3 @@ export function makeDomDriver(selector: string): Driver<Stream<VNode>, DOMSource
     },
   }
 }
-
-export { DOMSource } from './shared'
