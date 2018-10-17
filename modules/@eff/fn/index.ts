@@ -25,7 +25,7 @@ export function makeFnDriver(): Driver<Stream<FnSink>, void> {
           return xs.of(undefined)
         },
       }
-      return select(visitors, effects, sources)
+      return select<Effect>(visitors, effects, sources)
         .map(eff => {
           return Array.isArray(eff) ? xs.from(eff) : xs.of(eff)
         })

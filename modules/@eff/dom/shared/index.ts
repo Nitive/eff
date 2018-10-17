@@ -8,16 +8,16 @@ export { DOMSource } from './source'
 
 export function selectDOMEff(effects: any, sources: any): Stream<VNode> {
   const visitors: Partial<Visitors> = {
-    string(node) {
+    string(node: string) {
       return xs.of(node)
     },
-    number(node) {
+    number(node: number) {
       return xs.of(String(node))
     },
-    boolean(node) {
+    boolean(node: boolean) {
       return xs.of(String(node || ''))
     },
-    vnode(node, visit, sources) {
+    vnode(node: VNode, visit, sources) {
       if (node.children) {
         const children$ = visit(node.children, sources) as Stream<Array<any>>
 
@@ -31,7 +31,7 @@ export function selectDOMEff(effects: any, sources: any): Stream<VNode> {
     },
   }
 
-  const vnode$ = select(visitors, effects, sources)
+  const vnode$ = select<VNode>(visitors, effects, sources)
 
   return vnode$
     .map(vnode => {

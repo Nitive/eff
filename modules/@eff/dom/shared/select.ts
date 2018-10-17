@@ -27,22 +27,21 @@ export const standardVisitors: Partial<Visitors> = {
   component(node, visit, sources) {
     return visit(node(sources), sources)
   },
-  stream(node, visit, sources) {
-    return (node as Stream<any>)
+  stream(node: Stream<any>, visit, sources) {
+    return node
       .map(effects => visit(effects, sources))
       .flatten()
   },
-  array(node, visit, sources) {
+  array(node: Array<any>, visit, sources) {
     return xs
-      .combine(...(node as Array<any>)
-      .map(x => visit(x, sources)))
-      .map((nodes: Array<any>) => {
+      .combine(...node.map(x => visit(x, sources)))
+      .map(nodes => {
         return nodes
           .reduce((acc, child) => {
             return child !== undefined
               ? acc.concat(child)
               : acc
-          }, [] as Array<any>)
+          }, [])
       })
   },
   vnode(node, visit, sources) {
@@ -50,9 +49,9 @@ export const standardVisitors: Partial<Visitors> = {
   },
 }
 
-export function select(visitors: Partial<Visitors>, effects: any, sources: any): Stream<any> {
+export function select<T>(visitors: Partial<Visitors>, effects: any, sources: any): Stream<T> {
   const visit = (effects: any, sources: any) => {
-    return select(visitors, effects, sources)
+    return select<T>(visitors, effects, sources)
   }
 
   const visitorName: keyof Visitors =

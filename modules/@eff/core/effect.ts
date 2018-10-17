@@ -11,7 +11,7 @@ export function isEffect(eff: any): eff is Effect {
   return eff && eff['private_@eff_type'] === effectSymbol
 }
 
-export function createEffect(effectType: Symbol, sink$: Stream<any>) {
+export function createEffect(effectType: Symbol, sink$: Stream<any>): Effect {
   return {
     'private_@eff_type': effectSymbol,
     effectType,
