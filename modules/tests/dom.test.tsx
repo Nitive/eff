@@ -1,4 +1,4 @@
-import EffDOM, { DOMSource } from '@eff/dom'
+import EffDOM, { DOMSource } from 'eff-dom'
 import xs from 'xstream'
 import { render } from './test-utils'
 

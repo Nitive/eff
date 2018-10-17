@@ -2,7 +2,7 @@
   "private": true,
   "workspaces": [
     "modules/examples",
-    "modules/@eff/*"
+    "modules/eff-*"
   ],
   "devDependencies": {
     "@types/jest": "^23.3.5",

@@ -1,8 +1,8 @@
 {
-  "name": "@eff/fn",
+  "name": "eff-fn",
   "version": "0.0.1",
   "dependencies": {
-    "@eff/core": "*",
+    "eff-core": "*",
     "xstream": "^11.7.0"
   }
 }

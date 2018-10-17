@@ -1,7 +1,7 @@
-import { run } from '@eff/core'
-import EffDOM from '@eff/dom'
-import { makeDomDriver } from '@eff/dom/client'
-import { invoke, makeFnDriver } from '@eff/fn'
+import { run } from 'eff-core'
+import EffDOM from 'eff-dom'
+import { makeDomDriver } from 'eff-dom/client'
+import { invoke, makeFnDriver } from 'eff-fn'
 import xs from 'xstream'
 
 async function effs(app: any): Promise<{ DOM: string }> {

@@ -1,4 +1,4 @@
-import { isEffect } from '@eff/core'
+import { isEffect } from 'eff-core'
 import xs, { Stream } from 'xstream'
 import { isVNode } from './vnode'
 

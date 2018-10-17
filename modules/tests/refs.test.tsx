@@ -1,4 +1,4 @@
-import EffDOM, { DOMSource } from '@eff/dom'
+import EffDOM, { DOMSource } from 'eff-dom'
 import { render } from './test-utils'
 
 describe('refs', () => {

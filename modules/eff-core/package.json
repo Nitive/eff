@@ -1,8 +1,7 @@
 {
-  "name": "@eff/dom",
+  "name": "eff-core",
   "version": "0.0.1",
   "dependencies": {
-    "@eff/core": "*",
     "snabbdom": "^0.7.2",
     "xstream": "^11.7.0"
   }

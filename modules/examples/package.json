@@ -2,7 +2,7 @@
   "name": "examples",
   "version": "0.0.1",
   "dependencies": {
-    "@eff/dom": "*",
+    "eff-dom": "*",
     "@types/webpack": "^4.4.16",
     "file-loader": "^2.0.0",
     "ts-loader": "^5.2.1",

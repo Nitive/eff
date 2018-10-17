@@ -1,4 +1,4 @@
-import { Driver } from '@eff/core'
+import { Driver } from 'eff-core'
 import { VNode } from 'snabbdom/vnode'
 import { Stream } from 'xstream'
 import { DOMSource, selectDOMEff } from './shared'

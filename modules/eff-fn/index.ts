@@ -1,5 +1,5 @@
-import { createEffect, Driver, Effect } from '@eff/core'
-import { select } from '@eff/dom'
+import { createEffect, Driver, Effect } from 'eff-core'
+import { select } from 'eff-dom'
 import xs, { Stream } from 'xstream'
 
 type FnSink = { code: string, fn: () => void }

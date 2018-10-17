@@ -1,4 +1,4 @@
-import { Element } from '@eff/dom/types'
+import { Element } from 'eff-dom/types'
 import xs, { Stream } from 'xstream'
 import { keys } from './utils/keys'
 import { mapObject } from './utils/map-object'
