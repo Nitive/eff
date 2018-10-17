@@ -4,6 +4,7 @@ import xs, { Stream } from 'xstream'
 import fromEvent from 'xstream/extra/fromEvent'
 import pairwise from 'xstream/extra/pairwise'
 import { Ref } from './ref'
+import { Module } from 'snabbdom/modules/module'
 
 function createRef(id: string, elm$: Stream<Node | undefined>): Ref<Node> {
   return {
@@ -18,58 +19,44 @@ function createRef(id: string, elm$: Stream<Node | undefined>): Ref<Node> {
   }
 }
 
-function attachRefs(vnode: VNode, refs: { [refId: string]: Ref<Node> }): VNode {
-  const { data } = vnode
-  const ref = vnode.data && vnode.data.props && vnode.data.props.ref
-
-  if (!ref || !ref.id || !data) {
-    return vnode
+function createRefModule(refs: { [refId: string]: Ref<Node> }): Partial<Module> {
+  const run = (vn: VNode, elm: Node | undefined) => {
+    const refId = vn.data && vn.data.props && vn.data.props.ref && vn.data.props.ref.id
+    if (!refId) return
+    refs[refId].elm$.shamefullySendNext(elm)
   }
 
   return {
-    ...vnode,
-    data: {
-      ...data,
-      hook: {
-        ...data.hook,
-        insert: vn => {
-          refs[ref.id].elm$.shamefullySendNext(vn.elm || undefined)
-          if (data.hook && data.hook.insert) {
-            data.hook.insert(vn)
-          }
-        },
-        update: (old, vn) => {
-          refs[ref.id].elm$.shamefullySendNext(vn.elm || undefined)
-          if (data.hook && data.hook.update) {
-            data.hook.update(old, vn)
-          }
-        },
-        destroy: vn => {
-          refs[ref.id].elm$.shamefullySendNext(undefined)
-          if (data.hook && data.hook.destroy) {
-            data.hook.destroy(vn)
-          }
-        },
-      },
+    create(_old, vn) {
+      run(vn, vn.elm || undefined)
+    },
+    update: (_old, vn) => {
+      run(vn, vn.elm || undefined)
+    },
+    destroy: vn => {
+      run(vn, undefined)
     },
   }
 }
 
-function addStyle(vnode: VNode): VNode {
+function splitPropsAndAttrs(vnode: VNode): VNode {
   const props = vnode.data && vnode.data.props
 
   if (!props) {
     return vnode
   }
 
-  const { style, ...rest } = props
+  const { style, className, ref, class: classProp, key, ...attrs } = props
 
   return {
     ...vnode,
     data: {
       ...vnode.data,
-      props: rest,
+      props: { className, ref },
+      class: classProp,
+      attrs,
       style,
+      key,
     },
   }
 }
@@ -85,7 +72,7 @@ export function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
     const children = (vnode.children || []).map(prepareVNodes)
 
     return {
-      ...addStyle(attachRefs(vnode, refs)),
+      ...splitPropsAndAttrs(vnode),
       children,
     }
   }
@@ -95,12 +82,11 @@ export function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
   const withNode = (vnodeWithRefs$ as Stream<VNode | HTMLElement>).startWith(node)
 
   const patch = init([
+    createRefModule(refs),
     require('snabbdom/modules/class').default,
     require('snabbdom/modules/attributes').default,
     require('snabbdom/modules/props').default,
     require('snabbdom/modules/style').default,
-    require('snabbdom/modules/eventlisteners').default,
-    require('snabbdom/modules/dataset').default,
   ])
 
   withNode
