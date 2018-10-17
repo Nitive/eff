@@ -1,10 +1,11 @@
 import { init } from 'snabbdom'
+import { Module } from 'snabbdom/modules/module'
+import { toVNode } from 'snabbdom/tovnode'
 import { VNode } from 'snabbdom/vnode'
 import xs, { Stream } from 'xstream'
 import fromEvent from 'xstream/extra/fromEvent'
 import pairwise from 'xstream/extra/pairwise'
 import { Ref } from './ref'
-import { Module } from 'snabbdom/modules/module'
 
 function createRef(id: string, elm$: Stream<Node | undefined>): Ref<Node> {
   return {
@@ -79,7 +80,7 @@ export function runDomEffect(vnode$: Stream<VNode>, node: HTMLElement) {
 
   const vnodeWithRefs$ = vnode$.map(prepareVNodes)
 
-  const withNode = (vnodeWithRefs$ as Stream<VNode | HTMLElement>).startWith(node)
+  const withNode = vnodeWithRefs$.startWith(toVNode(node))
 
   const patch = init([
     createRefModule(refs),
