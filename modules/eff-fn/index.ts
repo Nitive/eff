@@ -30,9 +30,8 @@ export function makeFnDriver(): Driver<Stream<FnSink>, void> {
           return Array.isArray(eff) ? xs.from(eff) : xs.of(eff)
         })
         .flatten()
-        .map(eff => eff.sink$)
+        .map(eff => eff.sink)
         .flatten()
-        .filter(Boolean)
     },
   }
 }

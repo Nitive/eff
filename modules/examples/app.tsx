@@ -18,7 +18,6 @@ function App(_props: {}, sources: Sources) {
     .map(x => <div>Time is {x.toLocaleTimeString()}</div>)
 
   const buttonRef = sources.DOM.createRef()
-
   const buttonClick$ = buttonRef
     .events('click')
     .fold(acc => acc + 1, 0)

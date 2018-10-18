@@ -9,3 +9,19 @@ export function render(effects: any): string {
 
   return document.body.innerHTML
 }
+
+export function createFakeFetch(response: any): GlobalFetch['fetch'] {
+  return function fetch() {
+    return Promise.resolve({
+      json() {
+        return Promise.resolve(response)
+      },
+    } as any)
+  }
+}
+
+export function nextTick() {
+  return new Promise(resolve => {
+    setTimeout(resolve)
+  })
+}
