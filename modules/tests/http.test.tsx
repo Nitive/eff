@@ -1,6 +1,6 @@
 import { run } from 'eff-core'
 import EffDOM, { DOMSource } from 'eff-dom'
-import { makeDomDriver } from 'eff-dom/client'
+import { makeDOMDriver } from 'eff-dom/client'
 import { HTTPEffect, HTTPSource, makeHTTPDriver } from 'eff-http'
 import { createFakeFetch, nextTick } from './test-utils'
 
@@ -43,7 +43,7 @@ describe('http effect', () => {
     document.body.innerHTML = '<div id="app">Loading...</div>'
 
     run(<App />, {
-      DOM: makeDomDriver('#app'),
+      DOM: makeDOMDriver('#app'),
       HTTP: makeHTTPDriver({
         fetch: createFakeFetch({ current_user_url: 'http://github.com/user' }),
       }),
@@ -88,7 +88,7 @@ describe('http effect', () => {
     document.body.innerHTML = '<div id="app">Loading...</div>'
 
     run(<App />, {
-      DOM: makeDomDriver('#app'),
+      DOM: makeDOMDriver('#app'),
       HTTP: makeHTTPDriver({
         fetch: createFakeFetch({ current_user_url: 'http://github.com/user' }),
       }),
@@ -139,7 +139,7 @@ describe('http effect', () => {
     document.body.innerHTML = '<div id="app">Loading...</div>'
 
     run(<App />, {
-      DOM: makeDomDriver('#app'),
+      DOM: makeDOMDriver('#app'),
       HTTP: makeHTTPDriver({
         fetch: createFakeFetch({ current_user_url: 'http://github.com/user' }),
       }),
@@ -187,7 +187,7 @@ describe('http effect', () => {
     document.body.innerHTML = '<div id="app">Loading...</div>'
 
     run(<App />, {
-      DOM: makeDomDriver('#app'),
+      DOM: makeDOMDriver('#app'),
       HTTP: makeHTTPDriver({
         fetch: createFakeFetch(Promise.reject({ errorCode: 'UNEXPECTED_ERROR' })),
       }),
@@ -227,7 +227,7 @@ describe('http effect', () => {
     const fetch = jest.fn(createFakeFetch({ result: 'result' }))
 
     run(<App />, {
-      DOM: makeDomDriver('#app'),
+      DOM: makeDOMDriver('#app'),
       HTTP: makeHTTPDriver({ fetch }),
     })
 
@@ -274,7 +274,7 @@ describe('http effect', () => {
     const fetch = jest.fn(createFakeFetch({ result: 'result' }))
 
     run(<App />, {
-      DOM: makeDomDriver('#app'),
+      DOM: makeDOMDriver('#app'),
       HTTP: makeHTTPDriver({ fetch }),
     })
 
@@ -324,7 +324,7 @@ describe('http effect', () => {
     const fetch = jest.fn(createFakeFetch({ result: 'result' }))
 
     run(<App />, {
-      DOM: makeDomDriver('#app'),
+      DOM: makeDOMDriver('#app'),
       HTTP: makeHTTPDriver({ fetch }),
     })
 

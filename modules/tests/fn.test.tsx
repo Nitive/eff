@@ -1,13 +1,13 @@
 import { run } from 'eff-core'
 import EffDOM from 'eff-dom'
-import { makeDomDriver } from 'eff-dom/client'
+import { makeDOMDriver } from 'eff-dom/client'
 import { invoke, makeFnDriver } from 'eff-fn'
 import xs from 'xstream'
 
 async function effs(app: any): Promise<{ DOM: string }> {
   document.body.innerHTML = '<div id="app"></div>'
   run(app, {
-    DOM: makeDomDriver('#app'),
+    DOM: makeDOMDriver('#app'),
     fn: makeFnDriver(),
   })
 

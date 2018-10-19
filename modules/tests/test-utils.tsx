@@ -1,10 +1,10 @@
 import { run } from 'eff-core'
-import { makeDomDriver } from 'eff-dom/client'
+import { makeDOMDriver } from 'eff-dom/client'
 
 export function render(effects: any): string {
   document.body.innerHTML = '<div id="app">Loading...</div>'
   run(effects, {
-    DOM: makeDomDriver('#app'),
+    DOM: makeDOMDriver('#app'),
   })
 
   return document.body.innerHTML

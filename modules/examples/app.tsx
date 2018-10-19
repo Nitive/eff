@@ -1,6 +1,6 @@
 import { run } from 'eff-core'
 import EffDOM, { DOMSource } from 'eff-dom'
-import { makeDomDriver } from 'eff-dom/client'
+import { makeDOMDriver } from 'eff-dom/client'
 import xs from 'xstream'
 
 interface Sources {
@@ -34,5 +34,5 @@ function App(_props: {}, sources: Sources) {
 }
 
 run(<App />, {
-  DOM: makeDomDriver('#app'),
+  DOM: makeDOMDriver('#app'),
 })
